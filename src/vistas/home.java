@@ -6,8 +6,10 @@
 package vistas;
 
 import DAO.Conexion;
+import DAO.MiembroDAO;
 import DAO.UsuarioDAO;
 import clases.Hash;
+import clases.Miembro;
 import clases.Sucursal;
 import clases.Usuario;
 import java.sql.Connection;
@@ -29,11 +31,13 @@ public class home extends javax.swing.JFrame {
     Conexion cn = new Conexion();
     Sucursal s = new Sucursal();
     UsuarioDAO ud = new UsuarioDAO();
+    MiembroDAO md = new MiembroDAO();
     Usuario u = new Usuario();
     Connection con;
     PreparedStatement ps;
     ResultSet rs;
     DefaultTableModel modelo = new DefaultTableModel();
+    
     int id;
     
     public home() {
@@ -41,8 +45,30 @@ public class home extends javax.swing.JFrame {
         saludoU();
         setLocationRelativeTo(null);
         listar();
+        listarM();
     }
-    
+ 
+/*----- Lista los Miembros o clientes del gimnasio en la vista general -----*/
+    void listarM(){
+        List<Miembro> lista = md.consulta();
+        modelo = (DefaultTableModel) tablaMiembros.getModel();
+        Object[] ob = new Object[7];
+        
+        for (int i = 0; i < lista.size(); i++) {
+/*----- variables para poder concatenar el nombre y apellidos del cliente-----*/
+            String nombre = lista.get(i).getNombre();
+            String paterno = lista.get(i).getPaterno();
+            String materno = lista.get(i).getMaterno();
+            
+            ob[0] = lista.get(i).getIdSocio();
+            ob[1] = nombre + " " + paterno + " " + materno; 
+            ob[2] = lista.get(i).getTel();
+            ob[3] = lista.get(i).getIdEstado();
+            ob[4] = lista.get(i).getFechaCreacion();
+            modelo.addRow(ob);
+        }
+        tablaMiembros.setModel(modelo);    
+    }
     void listar(){
         List<Usuario> lista = ud.listar();
         modelo = (DefaultTableModel) tablaUsuarios.getModel();
@@ -74,28 +100,28 @@ public class home extends javax.swing.JFrame {
         menuvistaGeneral = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableMiembros = new javax.swing.JTable();
+        tablaMiembros = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        txtbuscar = new javax.swing.JTextField();
+        BuscarMiembro = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        txtNombreBM = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
+        txtTelefonoBM = new javax.swing.JLabel();
+        txtSucursalBM = new javax.swing.JLabel();
+        txtStatusBM = new javax.swing.JLabel();
+        txtFechaBM = new javax.swing.JLabel();
+        txtPlanPagoBM = new javax.swing.JLabel();
+        txtUsuarioCreoBM = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        btn_editarMiembro = new javax.swing.JButton();
         btn_eliminarMiembro = new javax.swing.JButton();
         btn_añadirMiembro = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
@@ -156,7 +182,7 @@ public class home extends javax.swing.JFrame {
                 .addGap(23, 23, 23))
         );
 
-        tableMiembros.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMiembros.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -172,7 +198,7 @@ public class home extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tableMiembros);
+        jScrollPane1.setViewportView(tablaMiembros);
 
         jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
         jLabel2.setText("Miembros");
@@ -200,17 +226,22 @@ public class home extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setText("ID membresía:");
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtbuscar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        jButton1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/buscar.png"))); // NOI18N
-        jButton1.setText("Buscar");
+        BuscarMiembro.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        BuscarMiembro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/buscar.png"))); // NOI18N
+        BuscarMiembro.setText("Buscar");
+        BuscarMiembro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BuscarMiembroActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel4.setText("Nombre:");
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel5.setText("...");
+        txtNombreBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtNombreBM.setText("...");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel6.setText("Status:");
@@ -230,32 +261,47 @@ public class home extends javax.swing.JFrame {
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Registrado por:");
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel12.setText("...");
+        txtTelefonoBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtTelefonoBM.setText("...");
 
-        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel13.setText("...");
+        txtSucursalBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtSucursalBM.setText("...");
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel14.setText("...");
+        txtStatusBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtStatusBM.setText("...");
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel15.setText("...");
+        txtFechaBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtFechaBM.setText("...");
 
-        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel16.setText("...");
+        txtPlanPagoBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtPlanPagoBM.setText("...");
 
-        jLabel17.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel17.setText("...");
+        txtUsuarioCreoBM.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtUsuarioCreoBM.setText("...");
 
-        jButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jButton2.setText("Editar");
+        btn_editarMiembro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btn_editarMiembro.setText("Editar");
+        btn_editarMiembro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_editarMiembroActionPerformed(evt);
+            }
+        });
 
         btn_eliminarMiembro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btn_eliminarMiembro.setText("Eliminar Miembro");
+        btn_eliminarMiembro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_eliminarMiembroActionPerformed(evt);
+            }
+        });
 
         btn_añadirMiembro.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btn_añadirMiembro.setText("Añadir un nuevo Miembro");
+        btn_añadirMiembro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_añadirMiembroActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -265,7 +311,7 @@ public class home extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(btn_añadirMiembro)
                 .addGap(43, 43, 43)
-                .addComponent(jButton2)
+                .addComponent(btn_editarMiembro)
                 .addGap(51, 51, 51)
                 .addComponent(btn_eliminarMiembro)
                 .addContainerGap(27, Short.MAX_VALUE))
@@ -276,7 +322,7 @@ public class home extends javax.swing.JFrame {
                 .addGap(29, 29, 29)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_añadirMiembro)
-                    .addComponent(jButton2)
+                    .addComponent(btn_editarMiembro)
                     .addComponent(btn_eliminarMiembro))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
@@ -294,8 +340,8 @@ public class home extends javax.swing.JFrame {
                                 .addComponent(jLabel7)
                                 .addGap(24, 24, 24)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(txtStatusBM, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtTelefonoBM, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel3)
@@ -306,30 +352,30 @@ public class home extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtbuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jButton1))
+                                        .addComponent(BuscarMiembro))
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtNombreBM, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(135, 135, 135)
                                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                             .addGroup(jPanel3Layout.createSequentialGroup()
                                                 .addComponent(jLabel8)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(txtFechaBM, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
                                             .addGroup(jPanel3Layout.createSequentialGroup()
                                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                     .addComponent(jLabel9)
                                                     .addComponent(jLabel10))
                                                 .addGap(91, 91, 91)
                                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addComponent(jLabel16, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                    .addComponent(txtSucursalBM, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(txtPlanPagoBM, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                             .addGroup(jPanel3Layout.createSequentialGroup()
                                                 .addGap(5, 5, 5)
                                                 .addComponent(jLabel11)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))))))))
+                                                .addComponent(txtUsuarioCreoBM, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))))))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(301, 301, 301)
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -341,35 +387,35 @@ public class home extends javax.swing.JFrame {
                 .addGap(32, 32, 32)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(txtbuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(BuscarMiembro))
                 .addGap(36, 36, 36)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jLabel5)
+                    .addComponent(txtNombreBM)
                     .addComponent(jLabel8)
-                    .addComponent(jLabel15))
+                    .addComponent(txtFechaBM))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(39, 39, 39)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel9)
-                            .addComponent(jLabel13)))
+                            .addComponent(txtSucursalBM)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(42, 42, 42)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
-                            .addComponent(jLabel12))))
+                            .addComponent(txtTelefonoBM))))
                 .addGap(39, 39, 39)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
-                    .addComponent(jLabel16)
+                    .addComponent(txtPlanPagoBM)
                     .addComponent(jLabel6)
-                    .addComponent(jLabel14))
+                    .addComponent(txtStatusBM))
                 .addGap(33, 33, 33)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(jLabel17))
+                    .addComponent(txtUsuarioCreoBM))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36))
@@ -753,6 +799,23 @@ public class home extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btn_EliminarUActionPerformed
 
+    private void btn_añadirMiembroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_añadirMiembroActionPerformed
+        addMember am = new addMember();
+        am.setVisible(true);
+    }//GEN-LAST:event_btn_añadirMiembroActionPerformed
+
+    private void btn_editarMiembroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_editarMiembroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_editarMiembroActionPerformed
+
+    private void btn_eliminarMiembroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarMiembroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_eliminarMiembroActionPerformed
+
+    private void BuscarMiembroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BuscarMiembroActionPerformed
+       buscarM();
+    }//GEN-LAST:event_BuscarMiembroActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -790,6 +853,11 @@ public class home extends javax.swing.JFrame {
             }
         });
     }
+    
+    /* -------- 1.- METODOS PARA MIEMBROS-----------*/
+    
+    
+   /* --------2.- METODOS PARA USUARIO-----------*/
     
     public void agregar(){
         
@@ -884,27 +952,60 @@ public class home extends javax.swing.JFrame {
         
         //txtViewU.setText("Hola " + login.nombre + "!");
     }
+    
+    public void buscarM(){
+        List<Miembro> miemEn = md.consulta();
+        int idBus = Integer.parseInt(txtbuscar.getText());
+        Object[] ob = new Object[7];
+        
+          
+        for (int i = 0; i < miemEn.size(); i++) {
+           ob[0] = miemEn.get(i).getIdSocio();
+           int p = (int) ob[0];
+           
+           if( p == idBus){
+                int idM = miemEn.get(p).getIdSocio();
+                int estado = miemEn.get(p).getIdEstado(); 
+                String fecha = miemEn.get(p).getFechaCreacion();
+                String nombre = miemEn.get(p).getNombre();
+                String paterno = miemEn.get(p).getPaterno();
+                String materno = miemEn.get(p).getMaterno();
+                String tel = miemEn.get(p).getTel();
+                int uscreo = miemEn.get(p).getIdUsuarioCreo();
+
+                txtNombreBM.setText(nombre + paterno + materno);
+                txtTelefonoBM.setText(tel);
+                txtStatusBM.setText("Pago vigente");
+                txtFechaBM.setText(fecha);
+                txtSucursalBM.setText("Queretaro");
+                txtPlanPagoBM.setText("Mensual");
+                txtUsuarioCreoBM.setText("Admin");
+                break;              
+           }else {
+                JOptionPane.showMessageDialog(null, "El Usuario no existe");         
+        }       
+        }
+  
+        }
+         
+    
+        
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Btn_cerrarSesión;
+    private javax.swing.JButton BuscarMiembro;
     private javax.swing.JButton btn_AgregarU;
     private javax.swing.JButton btn_EliminarU;
     private javax.swing.JButton btn_LimpiarU;
     private javax.swing.JButton btn_ModificarU;
     private javax.swing.JButton btn_añadirMiembro;
+    private javax.swing.JButton btn_editarMiembro;
     private javax.swing.JButton btn_eliminarMiembro;
     private javax.swing.JComboBox<String> cmb_estadoU;
     private javax.swing.JComboBox<String> cmb_rolU;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -918,7 +1019,6 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -931,17 +1031,24 @@ public class home extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JPanel menuAdminSoc;
     private javax.swing.JPanel menuReportes;
     private javax.swing.JPanel menuSucursales;
     private javax.swing.JTabbedPane menuvistaGeneral;
+    private javax.swing.JTable tablaMiembros;
     private javax.swing.JTable tablaUsuarios;
-    private javax.swing.JTable tableMiembros;
     private javax.swing.JPasswordField txtConfirmPass;
+    private javax.swing.JLabel txtFechaBM;
+    private javax.swing.JLabel txtNombreBM;
     private javax.swing.JTextField txtNombreU;
     private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JLabel txtPlanPagoBM;
+    private javax.swing.JLabel txtStatusBM;
+    private javax.swing.JLabel txtSucursalBM;
+    private javax.swing.JLabel txtTelefonoBM;
+    private javax.swing.JLabel txtUsuarioCreoBM;
     private javax.swing.JLabel txtViewU;
     private javax.swing.JTextField txt_Username;
+    private javax.swing.JTextField txtbuscar;
     // End of variables declaration//GEN-END:variables
 }
